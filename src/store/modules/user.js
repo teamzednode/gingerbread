@@ -10,12 +10,7 @@ const state = {
 // actions
 const actions = {
   loadFromConfigFile ({ commit }) {
-    fetch('/static/config.json')
-      .then((resp) => {
-        if (resp.ok) {
-          resp.json().then((configFromJson) => { commit('setUserConfig', configFromJson) })
-        }
-      })
+    commit('setUserConfig', require('../../../static/config.json'))
   }
 }
 
