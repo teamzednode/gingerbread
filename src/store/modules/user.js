@@ -16,7 +16,7 @@ const actions = {
           resp.json().then((configFromJson) => { commit('setUserConfig', configFromJson) })
         }
       })
-  },
+  }
 }
 
 // mutations
