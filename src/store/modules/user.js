@@ -17,10 +17,6 @@ const actions = {
         }
       })
   },
-
-  saveToConfigFile ({ state, commit }, product) {
-
-  }
 }
 
 // mutations
