@@ -28,6 +28,7 @@ export default {
 
     this.currentCycle = tezosRpc.getCurrentCycleFromCurrentBlock()
 
+    await tezosRpc.setSnapshotNumber()
     const contractIdsArray = await tezosRpc.getSnapshotDelegateData()
     this.contractsData = await tezosRpc.getContractsData(contractIdsArray)
     this.loadingText = ''
