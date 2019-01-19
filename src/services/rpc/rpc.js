@@ -3,22 +3,34 @@ export default class {
     this.url = url
     this.delegateHash = delegateHash
   }
-  set setFirstBlockOfCurrentCycle (blockNumber) {
-    this.firstBlockOfCurrentCycle = blockNumber
+  async setCycle (cycle) {
+    this.cycle = cycle
+    await this.setSnapshotNumber()
+  }
+  async getHeadCycle () {
+    return this.getCycleFromFirstBlock(await this.getFirstBlockOfCycle('head'))
+  }
+  async setCycleToHead () {
+    this.cycle = await this.getHeadCycle()
+    await this.setSnapshotNumber()
   }
   async setSnapshotNumber () {
-    this.snapshotNumber = await this.sendRequest('/chains/main/blocks/head/context/raw/json/rolls/owner/snapshot/' + this.getCurrentCycleFromCurrentBlock())
+    this.snapshotNumber = await this.sendRequest('/chains/main/blocks/head/context/raw/json/rolls/owner/snapshot/' + this.cycle)
   }
   async sendRequest (endpoint) {
     const response = await fetch(this.url + endpoint)
     return response.json()
   }
-  async getFirstBlockOfCurrentCycle () {
-    const levelsInCurrentCycle = await this.sendRequest('/chains/main/blocks/head/helpers/levels_in_current_cycle')
+  async getFirstBlockOfCycle (cycle) {
+    const levelsInCurrentCycle = await this.sendRequest('/chains/main/blocks/' + cycle + '/helpers/levels_in_current_cycle')
     return levelsInCurrentCycle.first
   }
-  async getSnapshotDelegateData () {
-    return this.sendRequest('/chains/main/blocks/' + await this.snapshotBlockNumber() + '/context/delegates/' + this.delegateHash + '/delegated_contracts')
+  async getCycleData () {
+    return this.sendRequest('/chains/main/blocks/' + await this.snapshotBlockNumber() + '/context/delegates/' + this.delegateHash + '/')
+  }
+  async getSnapshotDelegateContractIds () {
+    const delegateData = await this.getCycleData()
+    return delegateData.delegated_contracts
   }
   async getContractsData (contractIds) {
     let contractsData = []
@@ -34,10 +46,9 @@ export default class {
   async getContractData (contractId) {
     return this.sendRequest('/chains/main/blocks/' + await this.snapshotBlockNumber() + '/context/contracts/' + contractId)
   }
-
-  // Delegation Snapshot is taken 7 cycles ago.
   getDelegationCycle () {
-    return parseFloat(this.getCurrentCycleFromCurrentBlock() - 7)
+  // Delegation Snapshot is taken 7 cycles ago.
+    return parseFloat(this.cycle - 7)
   }
 
   /*
@@ -62,9 +73,9 @@ export default class {
     const snapshotBlockNumber = parseFloat(totalSnapshotNumber) * 256
     return snapshotBlockNumber
   }
-  getCurrentCycleFromCurrentBlock () {
+  getCycleFromFirstBlock (blockNumber) {
     // current cycle = most recent completed cycle
     // - 1 to get the last completed cycle
-    return parseFloat(Math.floor(this.firstBlockOfCurrentCycle / 4096) - 1)
+    return parseFloat(Math.floor(blockNumber / 4096) - 1)
   }
 }
