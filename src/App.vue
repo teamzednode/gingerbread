@@ -6,7 +6,7 @@
       <b-collapse is-nav id="nav_collapse">
         <b-navbar-nav>
           <b-nav-item to="/config">Config</b-nav-item>
-          <b-nav-item to="/rewards">All Cycles</b-nav-item>
+          <b-nav-item to="/cycles">All Cycles</b-nav-item>
           <b-nav-item to="/cycle_info/head">Cycle Info</b-nav-item>
         </b-navbar-nav>
       </b-collapse>
