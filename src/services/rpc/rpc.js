@@ -4,8 +4,12 @@ export default class {
     this.delegateHash = delegateHash
   }
   async setCycle (cycle) {
-    this.cycle = cycle
-    await this.setSnapshotNumber()
+    if (cycle === 'head') {
+      await this.setCycleToHead()
+    } else {
+      this.cycle = cycle
+      await this.setSnapshotNumber()
+    }
   }
   async getHeadCycle () {
     return this.getCycleFromFirstBlock(await this.getFirstBlockOfCycle('head'))

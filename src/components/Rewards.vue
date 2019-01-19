@@ -1,13 +1,12 @@
 <template>
   <div class="container pt-3">
     <div class="row">
-      <h1>Cycle {{currentCycle}}</h1>
-    </div>
-    <div class="row">
       {{loadingText}}
-      <b-table v-if="loadingText === ''" striped hover :fields="contractsDataFields" :items="contractsData">
-        <template slot="contractData" slot-scope="data">
-          {{tezosHelper.formatTezosNumericalData(data.item.contractData.balance)}}
+      <b-pagination size="md" :total-rows="cyclesData.length" v-model="currentPage" :per-page="10">
+      </b-pagination>
+      <b-table striped hover :items="cyclesData" :per-page="10" :current-page="currentPage">
+        <template slot="cycle" slot-scope="data">
+          <b-link :to="{name: 'CycleInfo', params: { cycle: data.value }}">{{data.value}}</b-link>
         </template>
       </b-table>
     </div>
@@ -22,42 +21,45 @@ import TezosHelper from '@/services/utils/tezos'
 export default {
   data () {
     return {
-      currentCycle: 0,
-      contractsDataFields: [
-        {key: 'contractId', label: 'Delegator'},
-        {key: 'contractData', label: 'Delegator Balance'}
-      ],
-      contractsData: [],
-      tezosHelper: new TezosHelper(),
-      loadingText: 'Loading...'
+      cyclesData: [],
+      currentPage: 1,
+      mostRecentCompletedCycle: 0,
+      mostRecentSnapshottedCycle: 0,
+      loadingText: 'Loading...',
+      tezosRpc: null,
+      tezosHelper: new TezosHelper()
     }
   },
   computed: mapState([
     'user'
   ]),
   methods: {
-    compareBalance: function (a, b) {
-      const balanceA = parseFloat(a.contractData.balance)
-      const balanceB = parseFloat(b.contractData.balance)
-
-      let comparisonValue = 0
-
-      if (balanceA < balanceB) {
-        comparisonValue = 1
-      } else if (balanceA > balanceB) {
-        comparisonValue = -1
+    async getAllCyclesData () {
+      for (let i = this.mostRecentCompletedCycle + 6; i > 0; i--) {
+        let status = ''
+        if (i > this.mostRecentCompletedCycle) {
+          status = 'Pending'
+        } else if (i === this.mostRecentCompletedCycle) {
+          status = 'Currently In Progress'
+        } else if (i < this.mostRecentCompletedCycle && i > (this.mostRecentCompletedCycle - 5)) {
+          status = 'Pending Rewards'
+        } else {
+          status = 'Delivered Rewards'
+        }
+        this.cyclesData.push(
+          {
+            'cycle': i,
+            'status': status
+          }
+        )
       }
-
-      return comparisonValue
     }
   },
   created: async function () {
-    const tezosRpc = new TezosRpc(this.user.tezos_rpc_address, this.user.baker_tz_address, 'head')
-    await tezosRpc.setCycleToHead()
-    this.currentCycle = tezosRpc.cycle
-    const contractIdsArray = await tezosRpc.getSnapshotDelegateContractIds()
-    this.contractsData = await tezosRpc.getContractsData(contractIdsArray)
-    this.contractsData.sort(this.compareBalance)
+    this.tezosRpc = new TezosRpc(this.user.tezos_rpc_address, this.user.baker_tz_address)
+    this.mostRecentCompletedCycle = await this.tezosRpc.getHeadCycle()
+    this.mostRecentSnapshottedCycle = this.mostRecentCompletedCycle + 6
+    await this.getAllCyclesData()
     this.loadingText = ''
   }
 }
