@@ -3,12 +3,14 @@ export default class {
     this.url = url
     this.delegateHash = delegateHash
   }
+  setSnapshotNumber (snapshotNumber) {
+    this.snapshotNumber = snapshotNumber
+  }
   async setCycle (cycle) {
     if (cycle === 'head') {
       await this.setCycleToHead()
     } else {
       this.cycle = cycle
-      await this.setSnapshotNumber()
     }
   }
   async getHeadCycle () {
@@ -16,10 +18,6 @@ export default class {
   }
   async setCycleToHead () {
     this.cycle = await this.getHeadCycle()
-    await this.setSnapshotNumber()
-  }
-  async setSnapshotNumber () {
-    this.snapshotNumber = await this.sendRequest('/chains/main/blocks/head/context/raw/json/rolls/owner/snapshot/' + this.cycle)
   }
   async sendRequest (endpoint) {
     const response = await fetch(this.url + endpoint)

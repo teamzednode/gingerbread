@@ -8,6 +8,9 @@
         <template slot="cycle" slot-scope="data">
           <b-link :to="{name: 'CycleInfo', params: { cycle: data.value }}">{{data.value}}</b-link>
         </template>
+        <template slot="stakingBalance" slot-scope="data">
+          {{tezosHelper.formatTezosNumericalData(data.value)}}
+        </template>
       </b-table>
     </div>
   </div>
@@ -31,7 +34,8 @@ export default {
     }
   },
   computed: mapState([
-    'user'
+    'user',
+    'snapshot'
   ]),
   methods: {
     async getAllCyclesData () {
@@ -46,10 +50,16 @@ export default {
         } else {
           status = 'Delivered Rewards'
         }
+
+        await this.tezosRpc.setCycle(i)
+        this.tezosRpc.setSnapshotNumber(this.snapshot.data[this.tezosRpc.cycle])
+        const cycleData = await this.tezosRpc.getCycleData()
+
         this.cyclesData.push(
           {
             'cycle': i,
-            'status': status
+            'status': status,
+            'stakingBalance': cycleData.staking_balance
           }
         )
       }
