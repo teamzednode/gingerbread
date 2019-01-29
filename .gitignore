@@ -61,8 +61,5 @@ typings/
 # next.js build output
 .next
 
-# Build result
-/dist
-
 # Optional application configuration:
 /static/config.json
