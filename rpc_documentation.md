@@ -27,14 +27,23 @@ To get the snapshot block number, calculate the total number of snapshots taken 
 
 For example:
 For cycle 75, the delegation cycle is 68 and the snapshot used is the 11th one as returned by the RPC call.
+
 First block of cycle 68: 
+
 `4096 * 68 = 278528`
+
 Total snapshots until first block of cycle 68:
+
 ` 278528 / 256 = 1088`
+
 Add the snapshot number returned from rpc (`11` + 1 to include the very first snapshot) to total snapshots until start of cycle 68:
+
 ` 1088 + 11 + 1 = 1100`
+
 1100th snapshot is used from delegation cycle 68 for cycle 75, get the block number of 1100th snapshot:
+
 `1100 * 256 = 281600`
+
 Snapshotted Block Number is **`281600`** 
 
 Reference to code using above logic: 
