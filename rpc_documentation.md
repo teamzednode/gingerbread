@@ -125,8 +125,6 @@ Similarly, to baking rewards, first get the endorsing rights and then get block'
 
 Since, Gingerbread requires endorsing and baking rewards for every delegate, we parse each block and use its data to parse the endorsers and bakers and the corresponding rewards. We store this data in a AWS DynamoDB instance for quicker access.
 
-*Note: to get metadata for a block, query the block+1 **** TODO FIX IN CODE
-
 Following  endpont is called for each block:
 `chains/main/blocks/head/`
 Which results in the following:
