@@ -1,3 +1,5 @@
+import Aws from '../../services/aws/aws'
+
 // initial state
 const state = {
   data: null
@@ -7,6 +9,10 @@ const state = {
 const actions = {
   loadFromConfigFile ({ commit }) {
     commit('setSnapshotData', require('../../../static/snapshots.json'))
+  },
+  async loadFromDynamoDB ({ commit }) {
+    const aws = new Aws()
+    commit('setSnapshotData', await aws.getAllSnapshotsData())
   }
 }
 
