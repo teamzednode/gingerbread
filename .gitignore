@@ -66,3 +66,4 @@ typings/
 
 # Optional application configuration:
 /static/config.json
+/statis/aws-config.json
