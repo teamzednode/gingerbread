@@ -7,9 +7,6 @@ const state = {
 
 // actions
 const actions = {
-  loadFromConfigFile ({ commit }) {
-    commit('setSnapshotData', require('../../../static/snapshots.json'))
-  },
   async loadFromDynamoDB ({ commit }) {
     const aws = new Aws()
     commit('setSnapshotData', await aws.getAllSnapshotsData())
