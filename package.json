@@ -18,10 +18,14 @@
     "npm": ">= 6.4.1"
   },
   "dependencies": {
+    "aws-sdk": "^2.395.0",
     "body-parser": "^1.18.3",
     "bootstrap": "^4.1.0",
     "bootstrap-vue": "^2.0.0-rc.11",
+    "es6-promise": "^4.2.5",
+    "esm": "^3.1.4",
     "express": "^4.16.4",
+    "isomorphic-fetch": "^2.2.1",
     "morgan": "^1.9.1",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1",

@@ -53,9 +53,10 @@ export default {
     }
   },
   created: async function () {
+    await this.$store.dispatch('snapshot/loadFromDynamoDB')
     const tezosRpc = new TezosRpc(this.user.tezos_rpc_address, this.user.baker_tz_address, this.$route.params.cycle)
     await tezosRpc.setCycle(this.$route.params.cycle)
-    tezosRpc.setSnapshotNumber(this.snapshot.data[tezosRpc.cycle])
+    tezosRpc.setSnapshotBlockNumber(this.snapshot.data[tezosRpc.cycle])
     this.currentCycle = tezosRpc.cycle
     const contractIdsArray = await tezosRpc.getSnapshotDelegateContractIds()
     this.contractsData = await tezosRpc.getContractsData(contractIdsArray)
