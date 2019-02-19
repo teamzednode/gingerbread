@@ -2,6 +2,8 @@
   "name": "Zednode",
   "feePercent": "10",
   "minimumContribution": 0,
-  "tezosRpcAddress": "https://mainnet-node.tzscan.io/",
+  "tezosRpcAddress": "http://mainnet-node.tzscan.io",
   "bakerTzAddress": "tz1L3vFD8mFzBaS8yLHFsd7qDJY1t276Dh8i"
 }
+
+
