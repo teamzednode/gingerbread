@@ -1,5 +1,6 @@
 import AwsService from '../src/services/aws/aws'
 import TezosRpc from '../src/services/rpc/rpc'
+const fs = require('fs');
 
 (async () => {
   const tezosConfig = require('../static/config.json')
@@ -9,7 +10,7 @@ import TezosRpc from '../src/services/rpc/rpc'
   const mostRecentCompletedCycle = await tezosRpc.getHeadCycle()
 
   const aws = new AwsService()
-
+  let snapshotData = []
   for(let i = 1; i <= mostRecentCompletedCycle + 6; i++) {
     const cycle = i
     await tezosRpc.setCycle(cycle)
@@ -22,17 +23,21 @@ import TezosRpc from '../src/services/rpc/rpc'
     }
 
     const snapshotNumber = tezosRpc.snapshotNumber
-    var params = {
-      TableName: 'SnapshotData',
-      Item: {
-        'cycleNumber' : {'N': cycle.toString() },
-        'snapshotBlockNumber': {'N': snapshotBlockNumber.toString() },
-        'snapshotNumber': {'N': tezosRpc.snapshotNumber.toString() }
-      }
-    };
-    await aws.putItem(params);
-    tezosRpc.setSnapshotBlockNumber(null)
 
+    snapshotData.push({
+      'cycleNumber': cycle,
+      'snapshotBlockNumber': snapshotBlockNumber,
+      'snapshotNumber': tezosRpc.snapshotNumber
+    })
     console.log('cycle: ', cycle, ', snapshotNumber: ', snapshotNumber, ', snapshotBlockNumber: ', snapshotBlockNumber)
+    tezosRpc.setSnapshotBlockNumber(null)
   }
+
+  fs.writeFile('../static/snapshotData.json', JSON.stringify(snapshotData), function(err) {
+    if(err) {
+      return console.log(err);
+    }
+    console.log('Saved: ', "snapshotData.json");
+  });
+
 })()

@@ -89,15 +89,25 @@ export default class {
 
   async getAllSnapshotsData () {
     const params = this.paramsForScan('SnapshotData', 'cycleNumber, snapshotBlockNumber, snapshotNumber')
-    return this.docClient.scan(params).promise().then(function (data) {
-      let snapshotData = {}
-      for (let i = 0; i < data.Items.length; i++) {
-        snapshotData[data.Items[i].cycleNumber] = data.Items[i].snapshotBlockNumber
-      }
-      return snapshotData
-    }).catch(function (err) {
-      console.log('Error Occured: ', err)
-    })
+    return this.docClient.scan(params).promise()
+  }
+
+  async snapshotNumberData () {
+    const data = await this.getAllSnapshotsData()
+    let snapshotNumberData = {}
+    for (let i = 0; i < data.Items.length; i++) {
+      snapshotNumberData[data.Items[i].cycleNumber] = data.Items[i].snapshotNumber
+    }
+    return snapshotNumberData
+  }
+
+  async snapshotBlockNumberData () {
+    const data = await this.getAllSnapshotsData()
+    let snapshotBlockNumberData = {}
+    for (let i = 0; i < data.Items.length; i++) {
+      snapshotBlockNumberData[data.Items[i].cycleNumber] = data.Items[i].snapshotBlockNumber
+    }
+    return snapshotBlockNumberData
   }
 
   async getRewardsDataForDelegate (cycle, delegateHash = this.delegateHash) {

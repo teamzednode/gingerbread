@@ -29,7 +29,8 @@ export default {
       ],
       contractsData: [],
       tezosHelper: new TezosHelper(),
-      loadingText: 'Loading...'
+      loadingText: 'Loading...',
+      cycleMetaData: {}
     }
   },
   computed: mapState([
@@ -53,11 +54,20 @@ export default {
     }
   },
   created: async function () {
-    await this.$store.dispatch('snapshot/loadFromDynamoDB')
+    await this.$store.dispatch('snapshot/loadFromJsonFile')
     const tezosRpc = new TezosRpc(this.user.tezos_rpc_address, this.user.baker_tz_address, this.$route.params.cycle)
     await tezosRpc.setCycle(this.$route.params.cycle)
-    tezosRpc.setSnapshotBlockNumber(this.snapshot.data[tezosRpc.cycle])
+    tezosRpc.setSnapshotBlockNumber(this.snapshot.snapshotblockNumberData[tezosRpc.cycle])
     this.currentCycle = tezosRpc.cycle
+
+    // TODO - Get More Data
+    const cycleData = await tezosRpc.getCycleData()
+    this.cycleMetaData.delegationCycle = tezosRpc.getDelegationCycle()
+    this.cycleMetaData.bakingCycle = this.currentCycle
+    this.cycleMetaData.snapshotNumber = this.snapshot.snapshotData[tezosRpc.cycle]
+    this.cycleMetaData.snapshotBlockNumber = this.snapshot.snapshotblockNumberData[tezosRpc.cycle]
+    this.cycleMetaData.stakingBalance = cycleData.staking_balance
+
     const contractIdsArray = await tezosRpc.getSnapshotDelegateContractIds()
     this.contractsData = await tezosRpc.getContractsData(contractIdsArray)
     this.contractsData.sort(this.compareBalance)
