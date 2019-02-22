@@ -17,7 +17,6 @@
 import { mapState } from 'vuex'
 import TezosRpc from '@/services/rpc/rpc'
 import TezosHelper from '@/services/utils/tezos'
-import Aws from '@/services/aws/aws'
 
 export default {
   data () {
@@ -52,11 +51,11 @@ export default {
       rewardsData: [],
       loadingText: 'Loading...',
       tezosRpc: null,
-      tezosHelper: new TezosHelper(),
-      aws: null
+      tezosHelper: new TezosHelper()
     }
   },
   computed: mapState([
+    'cycle',
     'user',
     'snapshot'
   ]),
@@ -75,22 +74,26 @@ export default {
       return status
     },
     async getAllCyclesData () {
-      const allCyclesData = await this.aws.getRewardsDataForDelegate()
-      for (let i = 0; i < allCyclesData.Items.length; i++) {
-        const rewardsData = allCyclesData.Items[i]
-        this.cyclesData.push({
-          'cycle': rewardsData.cycle,
-          'endorsingRewards': rewardsData.endorsingRewards,
-          'bakingRewards': rewardsData.bakingRewards,
-          'totalRewards': rewardsData.endorsingRewards + rewardsData.bakingRewards,
-          'status': this.getStatusOfCycle(rewardsData.cycle),
-          'stakingBalance': rewardsData.cycleData.staking_balance
-        })
+      const cycles = Object.keys(this.cycle.data)
+      for (let i = 0; i < cycles.length; i++) {
+        const cycle = cycles[i]
+        if (this.user.baker_tz_address in this.cycle.data[cycle]) {
+          const endorsingRewards = this.cycle.data[cycle][this.user.baker_tz_address]['endorsingRewards']
+          const bakingRewards = this.cycle.data[cycle][this.user.baker_tz_address]['bakingRewards']
+          const totalRewards = endorsingRewards + bakingRewards
+          this.cyclesData.push({
+            'cycle': cycles[i],
+            'endorsingRewards': endorsingRewards,
+            'bakingRewards': bakingRewards,
+            'totalRewards': totalRewards,
+            'status': this.getStatusOfCycle(cycle),
+            'stakingBalance': this.cycle.data[cycle][this.user.baker_tz_address]['stakingBalance']
+          })
+        }
       }
     }
   },
   created: async function () {
-    this.aws = new Aws(this.user.baker_tz_address)
     this.tezosRpc = new TezosRpc(this.user.tezos_rpc_address, this.user.baker_tz_address)
     this.mostRecentCompletedCycle = await this.tezosRpc.getHeadCycle()
     await this.getAllCyclesData()

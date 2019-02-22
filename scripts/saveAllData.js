@@ -11,7 +11,7 @@ function sleep(ms) {
   const block = 'head'
   const mostRecentCompletedCycle = await tezosRpc.getHeadCycle()
   const aws = new AwsService()
-  const snapshotData = await aws.getAllSnapshotsData()
+  const snapshotData = await aws.snapshotBlockNumberData()
 
   for(let i = 1; i <= mostRecentCompletedCycle + 6; i++) {
     await tezosRpc.setCycle(i)
@@ -21,7 +21,7 @@ function sleep(ms) {
     let bakingDataForCycle = {}
     if (i <= mostRecentCompletedCycle) {
       // get data from metadata - already baked
-      const allData = await tezosRpc.getEndorsingRewardsForCycle(i)
+      const allData = await tezosRpc.getEndorsingAndBakingRewardsForCycle(i)
       endorsingDataForCycle = allData['endorsingDataForCycle']
       bakingDataForCycle = allData['bakingDataForCycle']
     } else {

@@ -125,13 +125,13 @@ export default class {
     }
     return bakingRewardsData
   }
-  async getEndorsingRewardsForCycle (cycle) {
+  async getEndorsingAndBakingRewardsForCycle (cycle) {
     const firstBlockOfCycle = (cycle * 4096) + 1
     const lastBlockOfCycle = firstBlockOfCycle + 4095
     let endorsingDataForCycle = {}
     let bakingDataForCycle = {}
     for (let j = firstBlockOfCycle; j <= lastBlockOfCycle; j++) {
-      console.log('block: ', j)
+      console.log('For Cycle: ', cycle, ' , Blocks Remaining: ', lastBlockOfCycle - j)
       const blockMetadata = await this.getBlockMetadata(j + 1)
       const endorsingDataForBlock = await this.getEndorsingDataOfBlock(blockMetadata)
       const baker = blockMetadata.metadata.baker

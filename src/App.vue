@@ -22,6 +22,7 @@ export default {
   name: 'app',
   created () {
     this.$store.dispatch('user/loadFromConfigFile')
+    this.$store.dispatch('cycle/loadFromJsonFile')
   }
 }
 </script>
