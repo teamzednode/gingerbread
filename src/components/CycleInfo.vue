@@ -1,16 +1,19 @@
 <template>
   <div class="container pt-3">
-    <div class="row">
+    <b-row>
       <h1>Cycle {{currentCycle}}</h1>
-    </div>
-    <div class="row">
+    </b-row>
+    <b-row>
+      <b-table :items="[cycleMetaData]" />
+    </b-row>
+    <b-row>
       {{loadingText}}
       <b-table v-if="loadingText === ''" striped hover :fields="contractsDataFields" :items="contractsData">
         <template slot="contractData" slot-scope="data">
           {{tezosHelper.formatTezosNumericalData(data.item.contractData.balance)}}
         </template>
       </b-table>
-    </div>
+    </b-row>
   </div>
 </template>
 
@@ -35,7 +38,8 @@ export default {
   },
   computed: mapState([
     'user',
-    'snapshot'
+    'snapshot',
+    'cycle'
   ]),
   methods: {
     compareBalance: function (a, b) {
@@ -60,13 +64,14 @@ export default {
     tezosRpc.setSnapshotBlockNumber(this.snapshot.snapshotblockNumberData[tezosRpc.cycle])
     this.currentCycle = tezosRpc.cycle
 
-    // TODO - Get More Data
     const cycleData = await tezosRpc.getCycleData()
     this.cycleMetaData.delegationCycle = tezosRpc.getDelegationCycle()
     this.cycleMetaData.bakingCycle = this.currentCycle
     this.cycleMetaData.snapshotNumber = this.snapshot.snapshotData[tezosRpc.cycle]
     this.cycleMetaData.snapshotBlockNumber = this.snapshot.snapshotblockNumberData[tezosRpc.cycle]
-    this.cycleMetaData.stakingBalance = cycleData.staking_balance
+    this.cycleMetaData.stakingBalance = this.tezosHelper.formatTezosNumericalData(cycleData.staking_balance)
+    this.cycleMetaData.endorsingRewards = this.tezosHelper.formatTezosNumericalData(this.cycle.data[this.currentCycle][this.user.baker_tz_address]['endorsingRewards'])
+    this.cycleMetaData.bakingRewards = this.tezosHelper.formatTezosNumericalData(this.cycle.data[this.currentCycle][this.user.baker_tz_address]['bakingRewards'])
 
     const contractIdsArray = await tezosRpc.getSnapshotDelegateContractIds()
     this.contractsData = await tezosRpc.getContractsData(contractIdsArray)
