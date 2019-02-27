@@ -78,7 +78,7 @@ The following RPC call returns all the blocks with priority 0 assigned to specif
 
 If the above call responds with 4 blocks, the estimated block rewards would be `4 * 16 = 64` tz.
 
-Reference to code where above logic is used:
+The [method](https://github.com/teamzednode/gingerbread/blob/3ca6c94aef50bb7d4f39f658422d64e3f7817108/src/services/rpc/rpc.js#L115) `getBakingRightsOfCycle` in the `rpc.js` service file uses the above logic to calculate total baking rights of a cycle.
 
 To estimate the endorsement rewards, similarly, retrieve all the blocks where endorsing rights have been assigned to the delegate and add 2 TZ for each slot per block.
 
@@ -89,15 +89,11 @@ The following RPC call returns all the blocks assigned to a delegate for endorsi
 To get total endorsement rewards of the delegate, add 2 TZ for each slot. If the above call returns 10 blocks with 1 slot each and another 5 blocks with 2 slots in each, the total endorsement reward would be:
 `10 blocks * 1 slot * 2 TZ + 5 blocks * 2 slots * 2 TZ = 40 TZ`
 
-Reference to code where above logic is used:
+The [method](https://github.com/teamzednode/gingerbread/blob/3ca6c94aef50bb7d4f39f658422d64e3f7817108/src/services/rpc/rpc.js#L102) `getEndorsingRightsOfCycle` in the `rpc.js` service file uses the above logic to calculate total baking rights of a cycle.
 
-The above estimation methods for baking rewards and endorsing rewards assume that a delegate assigned priority 0 will always bake the block. This is not always true and a better way of estimating could be to use past data to predict the probability of baking/endorsing. For now, gingerbread uses the simple estimation method and assumes priority 0 assigned delegate always bakes.
+The above estimation methods for baking rewards and endorsing rewards assume that a delegate assigned priority 0 will always bake the block. This is not always true and a better way of estimating could be to use past data to predict the probability of baking/endorsing and adjust according to that. For now, gingerbread simply uses the methods mentioned above to predict the baking and endorsing rewards for future cycles.
 
-## For completely baked cycles:
-
-- total rewards from rpc call (for a given cycle, total rewards info is available from 8 cycles later, e.g total rewards for cycle 68 is obtained from getting info about cycle 76)
--  baking rewards - baking rights then obtain metadata to confirm
--  endorsing rewards - endorsing rights then obtain metadata to confirm.
+## For completely baked cycles
 
 ## Total Rewards
 To get total rewards per cycle and other related data (i.e staking balance), following RPC endpoint can be called:
@@ -132,7 +128,7 @@ Similarly, to baking rewards, first get the endorsing rights and then get block'
 
 # Rewards Data in Gingerbread
 
-Since, Gingerbread requires endorsing and baking rewards for every delegate, we parse each block and use its data to parse the endorsers and bakers and the corresponding rewards. We store this data in a AWS DynamoDB instance for quicker access.
+Since, Gingerbread requires endorsing and baking rewards for every delegate, we parse each block and use its data to parse the endorsers and bakers and the corresponding rewards. We store this data in a [json file](https://github.com/teamzednode/gingerbread/blob/master/static/allCyclesData.json) for quicker access.
 
 Following  endpont is called for each block:
 `chains/main/blocks/head/`
@@ -177,20 +173,28 @@ Which results in the following:
     	...
     }
 
-From the above result, the `metadata['baker']` field is used to assign baking rewards to the baker. For the endorsing awards, the `operations[0]` array contains data about each endorser of the block. In each element of that array, the endorsement reward is located in the `contents[0].metadata.balanceUpdates` array of objects. To get the endorsement reward, find the object in the previous array whose `category` field has the value `"endorsement"` and retrieve `change`  field has the endorsement reward value for the delegate in `delegate` field. 
+From the above result, the [`metadata['baker']`](https://github.com/teamzednode/gingerbread/blob/3ca6c94aef50bb7d4f39f658422d64e3f7817108/src/services/rpc/rpc.js#L137) field is used to assign baking rewards to the baker. For the endorsing awards, the `operations[0]` array contains data about each endorser of the block. In each element of that array, the endorsement reward is located in the `contents[0].metadata.balanceUpdates` array of objects. To get the endorsement reward, find the object in the previous array whose `category` field has the value `"endorsement"` and retrieve `change`  field has the endorsement reward value for the delegate in `delegate` field.
 
-The following function parses the endorsement rewards of a block using the above logic: 
+The function [getEndorsingDataOfBlock](https://github.com/teamzednode/gingerbread/blob/3ca6c94aef50bb7d4f39f658422d64e3f7817108/src/services/rpc/rpc.js#L76) parses the endorsement rewards of a block using the above logic.
 
-After retrieving the endorsing rewards and block rewards per block, they are added up to calculate the awards per cycle and that data is stored in the `Rewards` table with the following format:
+After retrieving the endorsing rewards and block rewards per block, they are added up to calculate the awards per cycle and that data is stored in the json file in the following format:
 
     {
-    	'cycle': <cycle_number>,
-    	'delegate': <delegate_hash>,
-    	'endorsingRewards': <total_endorsing_rewards_for_cycle_number>,
-    	'bakingRewards': <total_baking_rewards_for_cycle_number>,
-    	'cycleData': <snapshot_cycle_data>
+     <cycle_number>: {
+      <delegate_hash>: {
+       'endorsingRewards': '<amount>',
+       'bakingRewards': <amount>,
+       'stakingBalance': <amount>
+       },
+      <delegate_hash>: {
+       ...
+       }
+      },
+     <cycle_number>: {
+      ...
+     }
     }
 
-In the above table, the `cycleData` contains data about the delegation cycle for the cycle_number using the snapshot block. It has appropriate information such as `staking_balance ` for the cycle. 
+In the above table, the each cycle has its own object that has the delegateHash as the keys and and object with rewards data as the values.
 
-The script for retrieving, parsing and storing the rewards data is here: 
+The script for retrieving, parsing and storing the rewards data into a json file is here: [saveBlockchainDataToJson.js](https://github.com/teamzednode/gingerbread/blob/master/scripts/saveBlockchainDataToJson.js). This script [forks a child process](https://github.com/teamzednode/gingerbread/blob/3ca6c94aef50bb7d4f39f658422d64e3f7817108/scripts/saveBlockchainDataToJson.js#L16) for each cycle to allow for parallel processing. It takes about an hour for the script to finish parsing all cycles and store the data in the json file.
