@@ -7,3 +7,8 @@ ID = "gingerbread"
 
 [context.production]
   environment = { NODE_VERSION = "11.1.0", NODE_ENV = "development" }
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
