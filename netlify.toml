@@ -6,5 +6,5 @@ ID = "gingerbread"
    command = "npm run build"  # the command to build our site
 
 [context.production]
-  environment = { NODE_VERSION = "11.1.0", NODE_ENV = "production" }
-
+  environment = { NODE_VERSION = "11.1.0", NODE_ENV = "development" }
+NODE_ENV
