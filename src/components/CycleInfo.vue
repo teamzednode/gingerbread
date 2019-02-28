@@ -3,16 +3,18 @@
     <b-row>
       <h1>Cycle {{currentCycle}}</h1>
     </b-row>
-    <b-row>
-      <b-table :items="[cycleMetaData]" />
+    <b-row v-if="doneLoading()">
+      <b-table :fields="cycleMetaDataFields" :items="[cycleMetaData]" />
     </b-row>
     <b-row>
       {{loadingText}}
-      <b-table v-if="loadingText === ''" striped hover :fields="contractsDataFields" :items="contractsData">
+      <b-table v-if="doneLoading()" striped hover :fields="contractsDataFields" :items="contractsData" :per-page="perPage" :current-page="currentPage">
         <template slot="contractData" slot-scope="data">
           {{tezosHelper.formatTezosNumericalData(data.item.contractData.balance)}}
         </template>
       </b-table>
+      <b-pagination v-if="doneLoading()" size="md" :total-rows="contractsData.length" v-model="currentPage" :per-page="perPage">
+      </b-pagination>
     </b-row>
   </div>
 </template>
@@ -25,7 +27,32 @@ import TezosHelper from '@/services/utils/tezos'
 export default {
   data () {
     return {
+      perPage: 10,
+      currentPage: 1,
       currentCycle: this.$route.params.cycle,
+      cycleMetaDataFields: [
+        'delegationCycle',
+        'bakingCycle',
+        'snapshotNumber',
+        'snapshotBlockNumber',
+        {
+          key: 'stakingBalance',
+          label: 'Staking Balance',
+          formatter: (value) => { return this.tezosHelper.formatTezosNumericalData(value) }
+        },
+        {
+          key: 'endorsingRewards',
+          formatter: (value) => { return this.tezosHelper.formatTezosNumericalData(value) }
+        },
+        {
+          key: 'bakingRewards',
+          formatter: (value) => { return this.tezosHelper.formatTezosNumericalData(value) }
+        },
+        {
+          key: 'totalRewards',
+          formatter: (value) => { return this.tezosHelper.formatTezosNumericalData(value) }
+        }
+      ],
       contractsDataFields: [
         {key: 'contractId', label: 'Delegator'},
         {key: 'contractData', label: 'Delegator Balance'},
@@ -46,7 +73,6 @@ export default {
   methods: {
     setContractShare: function (stakingBalance, totalRewards) {
       for (let i = 0; i < this.contractsData.length; i++) {
-        console.log(this.contractsData[i])
         const rewardsSharePercentage = (this.contractsData[i].contractData.balance / stakingBalance)
         this.contractsData[i]['rewardsShare'] = (rewardsSharePercentage * 100).toFixed(2) + '%'
         this.contractsData[i]['rewardsAmount'] = this.tezosHelper.formatTezosNumericalData(
@@ -65,6 +91,9 @@ export default {
       }
 
       return comparisonValue
+    },
+    doneLoading: function () {
+      return this.loadingText === ''
     }
   },
   created: async function () {
@@ -79,18 +108,14 @@ export default {
     this.cycleMetaData.bakingCycle = this.currentCycle
     this.cycleMetaData.snapshotNumber = this.snapshot.snapshotData[tezosRpc.cycle]
     this.cycleMetaData.snapshotBlockNumber = this.snapshot.snapshotblockNumberData[tezosRpc.cycle]
-    this.cycleMetaData.stakingBalance = this.tezosHelper.formatTezosNumericalData(cycleData.staking_balance)
-    const endorsingRewards = this.cycle.data[this.currentCycle][this.user.baker_tz_address]['endorsingRewards']
-    const bakingRewards = this.cycle.data[this.currentCycle][this.user.baker_tz_address]['bakingRewards']
-    const totalRewards = endorsingRewards + bakingRewards
-    this.cycleMetaData.endorsingRewards = this.tezosHelper.formatTezosNumericalData(endorsingRewards)
-    this.cycleMetaData.bakingRewards = this.tezosHelper.formatTezosNumericalData(bakingRewards)
-    this.cycleMetaData.totalRewards = this.tezosHelper.formatTezosNumericalData(totalRewards)
+    this.cycleMetaData.stakingBalance = cycleData.staking_balance
+    this.cycleMetaData.endorsingRewards = this.cycle.data[this.currentCycle][this.user.baker_tz_address]['endorsingRewards']
+    this.cycleMetaData.bakingRewards = this.cycle.data[this.currentCycle][this.user.baker_tz_address]['bakingRewards']
+    this.cycleMetaData.totalRewards = this.cycleMetaData.endorsingRewards + this.cycleMetaData.bakingRewards
 
-    const contractIdsArray = await tezosRpc.getSnapshotDelegateContractIds()
-    this.contractsData = await tezosRpc.getContractsData(contractIdsArray)
-    this.setContractShare(cycleData.staking_balance, totalRewards)
+    this.contractsData = await tezosRpc.getContractsData(await tezosRpc.getSnapshotDelegateContractIds())
     this.contractsData.sort(this.compareBalance)
+    this.setContractShare(this.cycleMetaData.stakingBalance, this.cycleMetaData.totalRewards)
     this.loadingText = ''
   }
 }
