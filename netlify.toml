@@ -1,0 +1,10 @@
+ID = "gingerbread"
+
+# Our global, build settings
+[build]
+   publish = "dist/"      # the output diretory to push to the CDN after the build
+   command = "npm run build"  # the command to build our site
+
+[context.production]
+  environment = { NODE_VERSION = "11.1.0", NODE_ENV = "production" }
+
