@@ -1,7 +1,7 @@
 {
   "name": "Zednode",
-  "fee_percent": "10",
-  "minimum_contribution": 0,
-  "tezos_rpc_address": "https://rpc.tezrpc.me",
-  "baker_tz_address": "tz1L3vFD8mFzBaS8yLHFsd7qDJY1t276Dh8i"
+  "feePercent": "10",
+  "minimumContribution": 0,
+  "tezosRpcAddress": "https://rpc.tezrpc.me",
+  "bakerTzAddress": "tz1L3vFD8mFzBaS8yLHFsd7qDJY1t276Dh8i"
 }
