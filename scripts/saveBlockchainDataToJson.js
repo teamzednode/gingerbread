@@ -26,17 +26,4 @@ const util = require('util');
       });
     })
   }
-
-  const readFile = util.promisify(fs.readFile);
-  let allCyclesData = {}
-	for(let i = 7; i <= mostRecentCompletedCycle + 6; i++){
-    const cycleData = await readFile('../static/'+i+'.json')
-    allCyclesData = { ...allCyclesData, ...JSON.parse(cycleData.toString('utf8'))}
-	}
-  fs.writeFile('../static/allCyclesData.json', JSON.stringify(allCyclesData), function(err) {
-    if(err) {
-      return console.log(err);
-    }
-    console.log('Saved: ', "allCyclesData.json");
-  });
 })()
