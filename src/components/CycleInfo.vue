@@ -16,6 +16,9 @@
       <b-pagination v-if="doneLoading()" size="md" :total-rows="contractsData.length" v-model="currentPage" :per-page="perPage">
       </b-pagination>
     </b-row>
+    <b-row v-if="doneLoading()">
+      <b-button v-on:click="saveTransactionsFile()">Transactions Download</b-button>
+    </b-row>
   </div>
 </template>
 
@@ -57,7 +60,7 @@ export default {
         {key: 'contractId', label: 'Delegator'},
         {key: 'contractData', label: 'Delegator Balance'},
         {key: 'rewardsShare', label: 'Rewards Share'},
-        {key: 'rewardsAmount', label: 'Rewards Amount'}
+        {key: 'formattedRewardsAmount', label: 'Rewards Amount'}
       ],
       contractsData: [],
       tezosHelper: new TezosHelper(),
@@ -75,8 +78,9 @@ export default {
       for (let i = 0; i < this.contractsData.length; i++) {
         const rewardsSharePercentage = (this.contractsData[i].contractData.balance / stakingBalance)
         this.contractsData[i]['rewardsShare'] = (rewardsSharePercentage * 100).toFixed(2) + '%'
-        this.contractsData[i]['rewardsAmount'] = this.tezosHelper.formatTezosNumericalData(
-          totalRewards * (1 - (parseFloat(this.user.fee_percent) / 100)) * (rewardsSharePercentage))
+        this.contractsData[i]['rewardsAmount'] =
+          (totalRewards * (1 - (parseFloat(this.user.fee_percent) / 100)) * (rewardsSharePercentage))
+        this.contractsData[i]['formattedRewardsAmount'] = this.tezosHelper.formatTezosNumericalData(this.contractsData[i]['rewardsAmount'])
       }
     },
     compareBalance: function (a, b) {
@@ -94,6 +98,20 @@ export default {
     },
     doneLoading: function () {
       return this.loadingText === ''
+    },
+    saveTransactionsFile: function () {
+      let string = ''
+      for (let i = 0; i < this.contractsData.length; i++) {
+        string += this.contractsData[i].contractId + '=' + this.contractsData[i].rewardsAmount.toFixed(2) + '\n'
+      }
+      const blob = new Blob([string], {type: 'text/plain'})
+      const e = document.createEvent('MouseEvents')
+      const a = document.createElement('a')
+      a.download = 'transactions.txt'
+      a.href = window.URL.createObjectURL(blob)
+      a.dataset.downloadurl = ['text/json', a.download, a.href].join(':')
+      e.initEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null)
+      a.dispatchEvent(e)
     }
   },
   created: async function () {
@@ -115,6 +133,7 @@ export default {
 
     this.contractsData = await tezosRpc.getContractsData(await tezosRpc.getSnapshotDelegateContractIds())
     this.contractsData.sort(this.compareBalance)
+    this.contractsData = this.contractsData.filter(data => parseInt(data.contractData.balance) > 0)
     this.setContractShare(this.cycleMetaData.stakingBalance, this.cycleMetaData.totalRewards)
     this.loadingText = ''
   }
