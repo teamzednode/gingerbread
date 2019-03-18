@@ -22,8 +22,21 @@ For a more detailed explanation of how gingerbread interacts with the Tezos RPC,
 3. Start node with correct parameters: `sudo ./tezos-node run --rpc-addr=0.0.0.0:443 --cors-header='content-type' --cors-origin='*' --rpc-tls="/etc/letsencrypt/live/tezos-mainnet-rpc.zednode.com/fullchain.pem,/etc/letsencrypt/live/tezos-mainnet-rpc.zednode.com/privkey.pem"`
 
 ### Running Gingerbread Application
-1. Execute `npm run build`. Assets will now be located in `/dist` directory.
+1. Fork project and update `static/config.json`. `static/example.config.json` provides an example of all the required fields needed.
+2. Execute `npm run build`. Assets will now be located in `/dist` directory.
 2. Start web server from /dist directory. See above for easy deploy via [Netlify](https://www.netlify.com/).
+
+### Batch payouts to delegators
+1. Navigate to cycle you would like to pay out delegators for.(e.g. /cycle_info/83)
+2. Click Transactions Download button and save transactions to your local file system.
+3. Download `tezos-batch-payments` bash script from https://github.com/figment-networks/tezos-batch-payments. NOTE: we have tested this MD5 version `df8b37f3255d8923143eb680cf154720`. You can run `md5 tezos-batch-payments.bash` to check. PLEASE USE SCRIPT AT YOUR OWN RISK.
+4. Make sure your `tezos-client` locally is configured properly, here is what our `~/.tezos-client/config` looks like:
+```json
+{ "base_dir": "/Users/zednode/.tezos-client", "node_addr": "tezos-mainnet-rpc.zednode.com",
+  "node_port": 443, "tls": true, "web_port": 8080, "confirmations": 0 }
+ ```
+5. Create a "float" account. This account is only funded and used for payouts. `tezos-client gen keys float`
+6. Call batch payout script and specify your float address and transactions file. `./tezos-batch-payments.bash --use float --transactions-file ~/transactions/transactions_cycle_50.txt
 
 ## Build Commands
 ``` bash
