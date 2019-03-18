@@ -1,8 +1,25 @@
 # gingerbread
 Dashboard for Tezos Bakers
+Demo version at: https://gingerbread.zednode.com
 
-## Build Setup
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/teamzednode/gingerbread)
+NOTE: This will deploy with sample Zednode configuration, please fork and update `src/static/config.json` with your own delegate address and fees.
 
+## Getting started
+Gingerbread is a [Vue](https://vuejs.org/) based dashbaord application to assist bakers with their baking operations. The bare minimum dependendecies to get this running are:
+1. Tezos Node running with RPC enabled
+2. Static Gingerbread HTML/JS/CSS application hosted
+
+### Running a tezos node
+1. Head over [here](https://tezos.gitlab.io/mainnet/introduction/howtoget.html) and follow instructions and either use docker or build from sources. We have successfully built on Ubuntu 18.04.
+2. Install SSL certificates, we reccomend Let's Encrypt Certbot: https://certbot.eff.org/
+3. Start node with correct parameters: `sudo ./tezos-node run --rpc-addr=0.0.0.0:443 --cors-header='content-type' --cors-origin='*' --rpc-tls="/etc/letsencrypt/live/tezos-mainnet-rpc.zednode.com/fullchain.pem,/etc/letsencrypt/live/tezos-mainnet-rpc.zednode.com/privkey.pem"`
+
+### Running Gingerbread Application
+1. Execute `npm run build`. Assets will now be located in `/dist` directory.
+2. Start web server from /dist directory. See above for easy deploy via [Netlify](https://www.netlify.com/).
+
+## Build Commands
 ``` bash
 # install dependencies
 npm install
@@ -25,5 +42,3 @@ npm run e2e
 # run all tests
 npm test
 ```
-
-For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
