@@ -1,6 +1,6 @@
 {
-  "name": "my-vue-app",
-  "short_name": "my-vue-app",
+  "name": "gingerbread",
+  "short_name": "gingerbread",
   "icons": [
     {
       "src": "/static/img/icons/android-chrome-192x192.png",
