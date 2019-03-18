@@ -36,7 +36,8 @@ For a more detailed explanation of how gingerbread interacts with the Tezos RPC,
   "node_port": 443, "tls": true, "web_port": 8080, "confirmations": 0 }
  ```
 5. Create a "float" account. This account is only funded and used for payouts. `tezos-client gen keys float`
-6. Call batch payout script and specify your float address and transactions file. `./tezos-batch-payments.bash --use float --transactions-file ~/transactions/transactions_cycle_50.txt
+6. Reveal account: `tezos-client reveal key for float`
+7. Call batch payout script and specify your float address and transactions file. `./tezos-batch-payments.bash --use float --transactions-file ~/transactions/transactions_cycle_50.txt
 
 ## Build Commands
 ``` bash
