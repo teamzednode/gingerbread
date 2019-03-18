@@ -10,6 +10,8 @@ Gingerbread is a [Vue](https://vuejs.org/) based dashbaord application to assist
 1. Tezos Node running with RPC enabled
 2. Static Gingerbread HTML/JS/CSS application hosted
 
+For a more detailed explanation of how gingerbread interacts with the Tezos RPC, please see documentation here: https://github.com/teamzednode/gingerbread/blob/master/rpc_documentation.md
+
 ### Running a tezos node
 1. Head over [here](https://tezos.gitlab.io/mainnet/introduction/howtoget.html) and follow instructions and either use docker or build from sources. We have successfully built on Ubuntu 18.04.
 2. Install SSL certificates, we reccomend Let's Encrypt Certbot: https://certbot.eff.org/
