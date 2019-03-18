@@ -2,6 +2,10 @@
 Dashboard for Tezos Bakers
 Demo version at: https://gingerbread.zednode.com
 
+![image](https://user-images.githubusercontent.com/2114180/54505261-61b54300-48f4-11e9-9aac-8e9c8b3addf2.png)
+
+![image](https://user-images.githubusercontent.com/2114180/54505304-87dae300-48f4-11e9-8de2-732e7d3b8286.png)
+
 [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/teamzednode/gingerbread)
 NOTE: This will deploy with sample Zednode configuration, please fork and update `src/static/config.json` with your own delegate address and fees.
 
