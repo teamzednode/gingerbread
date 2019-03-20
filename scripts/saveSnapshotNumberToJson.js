@@ -1,4 +1,3 @@
-import AwsService from '../src/services/aws/aws'
 import TezosRpc from '../src/services/rpc/rpc'
 const fs = require('fs');
 
@@ -9,7 +8,6 @@ const fs = require('fs');
   let block = 'head'
   const mostRecentCompletedCycle = await tezosRpc.getHeadCycle()
 
-  const aws = new AwsService()
   let snapshotData = []
   for(let i = 1; i <= mostRecentCompletedCycle + 6; i++) {
     const cycle = i
