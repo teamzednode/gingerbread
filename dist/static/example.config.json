@@ -1,7 +1,6 @@
 {
   "name": "Zednode",
   "feePercent": "10",
-  "minimumContribution": 0,
   "tezosRpcAddress": "https://tezos-mainnet-rpc.zednode.com",
   "bakerTzAddress": "tz1L3vFD8mFzBaS8yLHFsd7qDJY1t276Dh8i"
 }
