@@ -10,9 +10,6 @@
           <b-form-group label="Fee %" label-for="config-fee-percent">
             <b-form-input id="config-fee-percent" type="number" v-model="user.fee_percent" :disabled="true"></b-form-input>
           </b-form-group>
-          <b-form-group label="Minimum contribution" label-for="config-minimum-contribution">
-            <b-form-input id="config-minimum-contribution" type="number" v-model="user.minimum_contribution" :disabled="true"></b-form-input>
-          </b-form-group>
           <b-form-group label="Tezos RPC address" label-for="config-tezos-rpc-address">
             <b-form-input id="config-tezos-rpc-address" type="text" v-model="user.tezos_rpc_address" :disabled="true"></b-form-input>
           </b-form-group>
@@ -20,9 +17,6 @@
             <b-form-input id="config-baker-tz-address" type="text" v-model="user.baker_tz_address" :disabled="true"></b-form-input>
           </b-form-group>
           <b-form-group class="text-center">
-            <b-button variant="primary col-3">
-              Save
-            </b-button>
           </b-form-group>
         </b-form>
       </div>
