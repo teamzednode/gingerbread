@@ -40,5 +40,4 @@ process.on('message', async ({mostRecentCompletedCycle, block, snapshotData, cyc
     }
   }
   process.send(cycleRewardsData)
-  process.exit()
 });
