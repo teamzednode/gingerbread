@@ -26,6 +26,17 @@ For a more detailed explanation of how gingerbread interacts with the Tezos RPC,
 2. Execute `npm run build`. Assets will now be located in `/dist` directory.
 2. Start web server from /dist directory. See above for easy deploy via [Netlify](https://www.netlify.com/).
 
+#### Bootstrap Data
+##### First time running
+1. `cd scripts`
+2. `node -r esm saveSnapshotNumberToJson.js`
+3. `node -r esm saveAllData.js`
+
+##### hourly job to keep data updated
+1. `cd scripts`
+2. `node -r esm hourlySaveToJson.js`
+
+
 ### Batch payouts to delegators
 1. Navigate to cycle you would like to pay out delegators for.(e.g. /cycle_info/83)
 2. Click Transactions Download button and save transactions to your local file system.
@@ -62,3 +73,26 @@ npm run e2e
 # run all tests
 npm test
 ```
+
+## License
+MIT License
+
+Copyright (c) 2019 Zednode
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
