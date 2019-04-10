@@ -26,6 +26,17 @@ For a more detailed explanation of how gingerbread interacts with the Tezos RPC,
 2. Execute `npm run build`. Assets will now be located in `/dist` directory.
 2. Start web server from /dist directory. See above for easy deploy via [Netlify](https://www.netlify.com/).
 
+#### Bootstrap Data
+##### First time running
+1. `cd scripts`
+2. `node -r esm saveSnapshotNumberToJson.js`
+3. `node -r esm saveAllData.js`
+
+##### hourly job to keep data updated
+1. `cd scripts`
+2. `node -r esm hourlySaveToJson.js`
+
+
 ### Batch payouts to delegators
 1. Navigate to cycle you would like to pay out delegators for.(e.g. /cycle_info/83)
 2. Click Transactions Download button and save transactions to your local file system.
