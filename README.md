@@ -30,7 +30,7 @@ For a more detailed explanation of how gingerbread interacts with the Tezos RPC,
 ##### First time running
 1. `cd scripts`
 2. `node -r esm saveSnapshotNumberToJson.js`
-3. `node -r esm saveAllData.js`
+3. `node -r esm saveBlockchainDataToJson.js`
 
 ##### hourly job to keep data updated
 1. `cd scripts`
